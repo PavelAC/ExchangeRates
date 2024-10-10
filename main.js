@@ -1,31 +1,20 @@
-async function convert()
-{
-    const amount= document.getElementById('amount').value;
-    const from= document.getElementById('from_currency').value.toUpperCase();
-    const to= document.getElementById('to_currency').value.toUpperCase();
-    const apiKey = '3414f7eef4596afd83330129f4d3ac7a';
-    
+const form = document.getElementById('converter');
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
 
-    const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${from}/${to}`;
-    try {
-        const response = await fetch(apiUrl);
-        
-        // Check if response is OK (status code 200-299)
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+    const fromCurrency = document.getElementById('from').value;
+    const toCurrency = document.getElementById('to').value;
+    const amount = parseFloat(document.getElementById('amount').value);
 
-        const data = await response.json();
+    const apiKey = 'cac7a1cdd1f30d36b805c162';
+    const url = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${fromCurrency}/${toCurrency}`;
 
-        // Check if the API result is 'success' and data contains conversion_rate
-        if (data.result === 'success' && data.conversion_rate) {
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
             const rate = data.conversion_rate;
             const result = rate * amount;
-            document.getElementById('result').textContent = `Converted: ${result} ${to}`;
-        } else {
-            document.getElementById('result').textContent = 'Error fetching exchange rate';
-        }
-    } catch (error) {
-        document.getElementById('result').textContent = 'Error: ' + error.message;
-    }
-}
+            document.getElementById('result').value = result.toFixed(2);
+        })
+        .catch(error => console.error('Error fetching the exchange rate:', error));
+});
