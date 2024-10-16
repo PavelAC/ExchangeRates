@@ -3,7 +3,7 @@ const fromCurrencySelect = document.getElementById('from');
 const toCurrencySelect = document.getElementById('to');
 const form = document.getElementById('converter');
 
-// Fetch and populate currency list
+// Fetch si populate
 async function fetchCurrencyList() {
     const url = `https://v6.exchangerate-api.com/v6/${apiKey}/codes`;
     try {
@@ -25,13 +25,12 @@ function populateCurrencyOptions(currencies) {
         option.value = currencyCode;
         option.textContent = `${currencyName} (${currencyCode})`;
 
-        // Append to both "From" and "To" select dropdowns
         fromCurrencySelect.appendChild(option.cloneNode(true));
         toCurrencySelect.appendChild(option);
     });
 }
 
-// Fetch and store exchange rates
+// Fetch si stocare rate
 async function fetchAndStoreRates(baseCurrency) {
     const url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/${baseCurrency}`;
     
@@ -42,9 +41,7 @@ async function fetchAndStoreRates(baseCurrency) {
         }
         const rates = await response.json();
         
-        // Check if the response has conversion_rates
         if (rates.conversion_rates) {
-            // Store the exchange rates and the last update time locally
             localStorage.setItem('exchangeRates', JSON.stringify(rates));
             localStorage.setItem('lastUpdated', new Date().toISOString());
         } else {
@@ -55,8 +52,6 @@ async function fetchAndStoreRates(baseCurrency) {
     }
 }
 
-
-// Convert currencies
 function convertCurrency(amount, fromCurrency, toCurrencies) {
     const cachedRates = JSON.parse(localStorage.getItem('exchangeRates'));
 
@@ -73,7 +68,7 @@ function convertCurrency(amount, fromCurrency, toCurrencies) {
             return;
         }
 
-        // Get the rates for the selected currencies
+        // Get rate pt selectate
         const fromRate = cachedRates.conversion_rates[fromCurrency];
         const toRate = cachedRates.conversion_rates[toCurrency];
 
@@ -105,7 +100,6 @@ function isCacheExpired() {
     return (now - lastUpdatedDate) > oneDay;
 }
 
-// Display last updated time
 function displayLastUpdated() {
     const lastUpdated = localStorage.getItem('lastUpdated');
     const lastUpdatedElement = document.getElementById('lastUpdated');
@@ -116,11 +110,9 @@ function displayLastUpdated() {
     }
 }
 
-// Handle form submit and conversion logic
 form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    // Get user input
     const amount = parseFloat(document.getElementById('amount').value);
     if (isNaN(amount) || amount <= 0) {
         alert('Please enter a valid amount.');
@@ -136,7 +128,6 @@ form.addEventListener('submit', async function (e) {
         return;
     }
 
-    // Check if cache is expired or if the user is online
     if (navigator.onLine && isCacheExpired()) {
         await fetchAndStoreRates(fromCurrency);
     }
@@ -147,6 +138,5 @@ form.addEventListener('submit', async function (e) {
     }
 });
 
-// Call the function to fetch and populate currencies when the page loads
 fetchCurrencyList();
 console.log(localStorage.getItem('exchangeRates'));
